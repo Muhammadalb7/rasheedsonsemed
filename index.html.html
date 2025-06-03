@@ -3142,6 +3142,10 @@
           <input type="text" id="new-product-name" required>
         </div>
         <div class="form-group">
+          <label for="new-product-generic-name">Generic Name</label>
+          <input type="text" id="new-product-generic-name" placeholder="Enter generic name (if applicable)">
+        </div>
+        <div class="form-group">
           <label for="new-product-description">Description</label>
           <textarea id="new-product-description" required></textarea>
         </div>
@@ -3165,10 +3169,6 @@
             <option value="General Store">General Store</option>
           </select>
         </div>
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="new-product-generic">
-          <label for="new-product-generic">Generic Medicine</label>
-        </div>
         <div class="form-group">
           <label for="new-product-image">Image URL</label>
           <input type="url" id="new-product-image" value="https://images.unsplash.com/photo-1580281658620-f7d75326912c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" required>
@@ -3187,6 +3187,10 @@
         <div class="form-group">
           <label for="edit-product-name">Product Name</label>
           <input type="text" id="edit-product-name" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-product-generic-name">Generic Name</label>
+          <input type="text" id="edit-product-generic-name" placeholder="Enter generic name (if applicable)">
         </div>
         <div class="form-group">
           <label for="edit-product-description">Description</label>
@@ -3211,10 +3215,6 @@
             <option value="Cosmetics">Cosmetics</option>
             <option value="General Store">General Store</option>
           </select>
-        </div>
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="edit-product-generic">
-          <label for="edit-product-generic">Generic Medicine</label>
         </div>
         <div class="form-group">
           <label for="edit-product-image">Image URL</label>
@@ -4977,7 +4977,7 @@
             <h4 class="product-manage-name">${product.name}</h4>
             <div class="product-manage-price">Rs.${product.price.toFixed(2)}</div>
             <div class="product-manage-category">Category: ${product.category}</div>
-            <div class="product-manage-generic">${product.isGeneric ? '<span style="color: #00796b; font-weight: 600;"><i class="fas fa-check-circle"></i> Generic</span>' : '<span style="color: #777;"><i class="fas fa-times-circle"></i> Branded</span>'}</div>
+            ${product.genericName ? `<div class="product-manage-generic">Generic Name: ${product.genericName}</div>` : ''}
             <div class="product-manage-actions">
               <button class="edit-product-btn" data-id="${product.id}"><i class="fas fa-edit"></i> Edit</button>
               <button class="delete-product-btn" data-id="${product.id}"><i class="fas fa-trash"></i> Delete</button>
@@ -4998,7 +4998,7 @@
       productsGrid.querySelectorAll('.delete-product-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           const productId = parseInt(this.getAttribute('data-id'));
-          if (confirm(`Are you sure you want to delete this product?`)) {
+          if (confirm('Are you sure you want to delete this product?')) {
             deleteProduct(productId);
           }
         });
@@ -5138,95 +5138,6 @@
       });
     }
     
-    // Modify the existing populateProductsGrid function to handle product editing properly
-    function populateProductsGrid(products) {
-      const productsGrid = document.getElementById('products-grid');
-      if (!productsGrid) return;
-      
-      productsGrid.innerHTML = '';
-      
-      products.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-manage-card';
-        productCard.innerHTML = `
-          <img src="${product.image}" alt="${product.name}" class="product-manage-image">
-          <div class="product-manage-info">
-            <h4 class="product-manage-name">${product.name}</h4>
-            <div class="product-manage-price">Rs.${product.price.toFixed(2)}</div>
-            <div class="product-manage-category">Category: ${product.category}</div>
-            <div class="product-manage-generic">${product.isGeneric ? '<span style="color: #00796b; font-weight: 600;"><i class="fas fa-check-circle"></i> Generic</span>' : '<span style="color: #777;"><i class="fas fa-times-circle"></i> Branded</span>'}</div>
-            <div class="product-manage-actions">
-              <button class="edit-product-btn" data-id="${product.id}"><i class="fas fa-edit"></i> Edit</button>
-              <button class="delete-product-btn" data-id="${product.id}"><i class="fas fa-trash"></i> Delete</button>
-            </div>
-          </div>
-        `;
-        productsGrid.appendChild(productCard);
-      });
-      
-      // Add event listeners to product action buttons
-      productsGrid.querySelectorAll('.edit-product-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const productId = parseInt(this.getAttribute('data-id'));
-          openEditProductModal(productId);
-        });
-      });
-      
-      productsGrid.querySelectorAll('.delete-product-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const productId = parseInt(this.getAttribute('data-id'));
-          if (confirm(`Are you sure you want to delete this product?`)) {
-            deleteProduct(productId);
-          }
-        });
-      });
-    }
-    
-    // Replace the add product button event listener in the initSellerDashboard function
-    // Add product button
-    const addProductBtn = document.getElementById('add-product-btn');
-    if (addProductBtn) {
-      addProductBtn.addEventListener('click', function() {
-        openAddProductModal();
-      });
-    }
-    
-    // Add these new functions after loadDashboardData()
-    
-    // Function to open add product modal
-    function openAddProductModal() {
-      const modal = document.getElementById('add-product-modal');
-      if (!modal) return;
-      
-      // Reset form
-      document.getElementById('add-product-form').reset();
-      
-      // Show modal
-      modal.style.display = 'flex';
-    }
-    
-    // Function to open edit product modal
-    function openEditProductModal(productId) {
-      const modal = document.getElementById('edit-product-modal');
-      if (!modal) return;
-      
-      // Find product
-      const product = products.find(p => p.id === productId);
-      if (!product) return;
-      
-      // Populate form
-      document.getElementById('edit-product-id').value = product.id;
-      document.getElementById('edit-product-name').value = product.name;
-      document.getElementById('edit-product-description').value = product.description;
-      document.getElementById('edit-product-price').value = product.price;
-      document.getElementById('edit-product-category').value = product.category;
-      document.getElementById('edit-product-generic').checked = product.isGeneric || false;
-      document.getElementById('edit-product-image').value = product.image;
-      
-      // Show modal
-      modal.style.display = 'flex';
-    }
-    
     // Function to add a new product
     function addProduct(productData) {
       // Generate new ID (would be handled by server in real app)
@@ -5239,7 +5150,7 @@
         description: productData.description,
         price: parseFloat(productData.price),
         category: productData.category,
-        isGeneric: productData.isGeneric || false,
+        genericName: productData.genericName || '',
         image: productData.image
       };
       
@@ -5274,7 +5185,7 @@
         description: productData.description,
         price: parseFloat(productData.price),
         category: productData.category,
-        isGeneric: productData.isGeneric || false,
+        genericName: productData.genericName || '',
         image: productData.image
       };
       
@@ -5334,7 +5245,7 @@
             description: document.getElementById('new-product-description').value,
             price: document.getElementById('new-product-price').value,
             category: document.getElementById('new-product-category').value,
-            isGeneric: document.getElementById('new-product-generic').checked,
+            genericName: document.getElementById('new-product-generic-name').value,
             image: document.getElementById('new-product-image').value
           };
           
@@ -5354,14 +5265,14 @@
             description: document.getElementById('edit-product-description').value,
             price: document.getElementById('edit-product-price').value,
             category: document.getElementById('edit-product-category').value,
-            isGeneric: document.getElementById('edit-product-generic').checked,
+            genericName: document.getElementById('edit-product-generic-name').value,
             image: document.getElementById('edit-product-image').value
           };
           
           updateProduct(productData);
         });
       }
-      
+
       // Close add product modal
       const closeAddProductModal = document.getElementById('close-add-product-modal');
       if (closeAddProductModal) {
@@ -5389,6 +5300,28 @@
           editProductModal.style.display = 'none';
         }
       });
+    }
+
+    // Function to open edit product modal
+    function openEditProductModal(productId) {
+      const modal = document.getElementById('edit-product-modal');
+      if (!modal) return;
+      
+      // Find product
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+      
+      // Populate form
+      document.getElementById('edit-product-id').value = product.id;
+      document.getElementById('edit-product-name').value = product.name;
+      document.getElementById('edit-product-generic-name').value = product.genericName || '';
+      document.getElementById('edit-product-description').value = product.description;
+      document.getElementById('edit-product-price').value = product.price;
+      document.getElementById('edit-product-category').value = product.category;
+      document.getElementById('edit-product-image').value = product.image;
+      
+      // Show modal
+      modal.style.display = 'flex';
     }
 
     // Add this to the initProductManagement function or create a new function
@@ -6265,6 +6198,18 @@
           }
         });
       });
+    }
+
+    // Function to open add product modal
+    function openAddProductModal() {
+      const modal = document.getElementById('add-product-modal');
+      if (!modal) return;
+      
+      // Reset form
+      document.getElementById('add-product-form').reset();
+      
+      // Show modal
+      modal.style.display = 'flex';
     }
   </script>
 

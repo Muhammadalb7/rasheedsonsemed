@@ -1,0 +1,50 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "orders": {
+      ".read": "auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'admin') || (root.child('users').child(auth.uid).child('role').val() === 'manager') || (root.child('users').child(auth.uid).child('role').val() === 'agent'))",
+      ".write": "auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'admin') || (root.child('users').child(auth.uid).child('role').val() === 'manager'))",
+      "$order_id": {
+        ".validate": "newData.hasChildren(['id', 'customer', 'items', 'total', 'status'])",
+        "status": {
+          ".validate": "newData.val() === 'pending' || (auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'admin') || (root.child('users').child(auth.uid).child('role').val() === 'manager')))"
+        }
+      }
+    },
+    "users": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$uid": {
+        ".validate": "newData.hasChildren(['role', 'permissions', 'email'])",
+        "role": {
+          ".validate": "newData.val() === 'admin' || newData.val() === 'manager' || newData.val() === 'agent'"
+        },
+        "permissions": {
+          ".validate": "newData.hasChildren(['viewOrders', 'manageOrders', 'viewProducts', 'manageProducts', 'viewCustomers', 'manageUsers'])"
+        }
+      }
+    },
+    "products": {
+      ".read": "auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'admin') || (root.child('users').child(auth.uid).child('role').val() === 'manager') || (root.child('users').child(auth.uid).child('role').val() === 'agent'))",
+      ".write": "auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'admin') || (root.child('users').child(auth.uid).child('role').val() === 'manager'))"
+    },
+    "feedback": {
+      ".read": "auth != null && root.child('sellers').child(auth.uid).exists()",
+      ".write": true,
+      "$feedback_id": {
+        ".validate": "newData.hasChildren(['id', 'name', 'message', 'date', 'status'])",
+        "status": {
+          ".validate": "newData.val() === 'unread' || (auth != null && root.child('sellers').child(auth.uid).exists())"
+        }
+      }
+    },
+    "sellers": {
+      ".read": "auth != null",
+      ".write": false,
+      "$uid": {
+        ".validate": "newData.isBoolean()"
+      }
+    }
+  }
+} 
